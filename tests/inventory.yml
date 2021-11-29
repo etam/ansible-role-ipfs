@@ -1,0 +1,11 @@
+all:
+  hosts:
+    testvm0:
+      ansible_host: testvm0
+      ansible_user: vagrant
+    testvm1:
+      ansible_host: testvm1
+      ansible_user: vagrant
+    testvm2:
+      ansible_host: testvm2
+      ansible_user: vagrant

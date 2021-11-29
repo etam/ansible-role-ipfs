@@ -1,0 +1,91 @@
+- name: get service facts
+  service_facts:
+
+- name: Create ipfs group
+  become: yes
+  group:
+    system: yes
+    name: ipfs
+
+- name: Create ipfs user
+  become: yes
+  user:
+    system: yes
+    name: ipfs
+    group: ipfs
+    home: /var/lib/ipfs
+
+- name: Create download directory
+  become: yes
+  file:
+    path: "/usr/local/lib/ipfs-{{ ipfs_version }}"
+    state: directory
+
+- name: Download ipfs
+  become: yes
+  unarchive:
+    src: "{{ (ansible_facts.services[\"ipfs.service\"] is defined and ansible_facts.services[\"ipfs.service\"].state == \"running\") | ternary(ipfs_local_release_url, ipfs_public_release_url) }}"
+    dest: "/usr/local/lib/ipfs-{{ ipfs_version }}"
+    creates: "/usr/local/lib/ipfs-{{ ipfs_version }}/go-ipfs"
+    remote_src: yes
+    owner: root
+    group: root
+
+- name: Link ipfs binary
+  become: yes
+  file:
+    src: "/usr/local/lib/ipfs-{{ ipfs_version }}/go-ipfs/ipfs"
+    dest: "/usr/local/bin/ipfs"
+    state: link
+  notify: Restart ipfs
+
+- name: Init ipfs
+  become: yes
+  become_user: ipfs
+  command:
+    cmd: "ipfs init -e -p \"{{ ipfs_init_profile }}\""
+    creates: /var/lib/ipfs/.ipfs
+
+- name: Install ipfs.service
+  become: yes
+  copy:
+    src: ipfs.service
+    dest: /etc/systemd/system/ipfs.service
+    owner: root
+    group: root
+  notify: Restart ipfs
+
+- name: Install ipfs-gc.service
+  become: yes
+  copy:
+    src: ipfs-gc.service
+    dest: /etc/systemd/system/ipfs-gc.service
+    owner: root
+    group: root
+  notify: Reload systemd
+
+- name: Install ipfs-gc.timer
+  become: yes
+  template:
+    src: ipfs-gc.timer.j2
+    dest: /etc/systemd/system/ipfs-gc.timer
+    owner: root
+    group: root
+  notify: Reload systemd
+
+- name: Start ipfs
+  become: yes
+  systemd:
+    daemon_reload: yes
+    name: ipfs
+    enabled: yes
+    state: started
+  register: ipfs_start
+
+- name: Start ipfs-gc
+  become: yes
+  systemd:
+    daemon_reload: yes
+    name: ipfs-gc.timer
+    enabled: yes
+    state: started

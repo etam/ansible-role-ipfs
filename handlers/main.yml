@@ -1,0 +1,13 @@
+- name: Reload systemd
+  become: yes
+  systemd:
+    daemon_reload: yes
+
+- name: Restart ipfs
+  become: yes
+  systemd:
+    daemon_reload: yes
+    name: ipfs
+    enabled: yes
+    state: restarted
+  when: (ipfs_start | default({})) is not changed

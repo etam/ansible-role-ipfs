@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  (0..2).each do |i|
+    config.vm.define "testvm#{i}" do |testvm|
+      testvm.vm.box = "generic/ubuntu2004"
+
+      testvm.trigger.after [:up, :resume] do |trigger|
+        trigger.info = "Updating ssh config..."
+        trigger.run = {inline: "./vagrant_ssh_config_update.sh add testvm#{i}"}
+      end
+
+      testvm.trigger.before [:halt, :destroy, :suspend] do |trigger|
+        trigger.info = "Cleaning up ssh config..."
+        trigger.run = {inline: "./vagrant_ssh_config_update.sh remove testvm#{i}"}
+      end
+    end
+  end
+end
