@@ -13,7 +13,7 @@
     system: yes
     name: ipfs
     group: ipfs
-    home: /var/lib/ipfs
+    home: "{{ ipfs_home_dir }}"
 
 - name: Create download directory
   become: yes
@@ -39,17 +39,46 @@
     state: link
   notify: Restart ipfs
 
+- name: Blocks dir
+  when: ipfs_blocks_dir is defined
+  block:
+
+    - name: Create blocks dir
+      become: yes
+      file:
+        path: "{{ ipfs_blocks_dir }}"
+        state: directory
+        owner: ipfs
+        group: ipfs
+
+    - name: Create ipfs dir
+      become: yes
+      file:
+        path: "{{ ipfs_home_dir }}/.ipfs/"
+        state: directory
+        owner: ipfs
+        group: ipfs
+
+    - name: Link blocks dir
+      become: yes
+      become_user: ipfs
+      file:
+        state: link
+        path: "{{ ipfs_home_dir }}/.ipfs/blocks"
+        src: "{{ ipfs_blocks_dir }}"
+      notify: Restart ipfs
+
 - name: Init ipfs
   become: yes
   become_user: ipfs
   command:
     cmd: "ipfs init -e -p \"{{ ipfs_init_profile }}\""
-    creates: /var/lib/ipfs/.ipfs
+    creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
 - name: Install ipfs.service
   become: yes
-  copy:
-    src: ipfs.service
+  template:
+    src: ipfs.service.j2
     dest: /etc/systemd/system/ipfs.service
     owner: root
     group: root

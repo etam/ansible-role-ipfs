@@ -7,7 +7,10 @@ After=network.target
 
 [Service]
 # hardening
-ReadWritePaths="/var/lib/ipfs/"
+ReadWritePaths="{{ ipfs_home_dir }}"
+{% if ipfs_blocks_dir is defined %}
+ReadWritePaths="{{ ipfs_blocks_dir }}"
+{% endif %}
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectKernelTunables=true

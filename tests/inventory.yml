@@ -3,6 +3,7 @@ all:
     testvm0:
       ansible_host: testvm0
       ansible_user: vagrant
+      ipfs_blocks_dir: /data/ipfs
     testvm1:
       ansible_host: testvm1
       ansible_user: vagrant
