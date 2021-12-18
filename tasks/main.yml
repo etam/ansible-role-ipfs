@@ -75,6 +75,12 @@
     cmd: "ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
+- name: Config ipfs Gateway.PublicGateways
+  become: yes
+  become_user: ipfs
+  command:
+    cmd: "ipfs config --json Gateway.PublicGateways '{\"localhost\": null }'"
+
 - name: Install ipfs.service
   become: yes
   template:
