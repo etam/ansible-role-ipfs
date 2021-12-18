@@ -50,8 +50,6 @@
         state: directory
         owner: ipfs
         group: ipfs
-        # in case system was reinstalled and directory exists, but has wrong owner
-        recurse: true
 
     - name: Create ipfs dir
       become: yes
