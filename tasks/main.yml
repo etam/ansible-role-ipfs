@@ -1,4 +1,4 @@
-- name: get service facts
+- name: Get service facts
   service_facts:
 
 - name: Create ipfs group
@@ -25,7 +25,7 @@
   become: yes
   unarchive:
     src: "{{ (ansible_facts.services[\"ipfs.service\"] is defined and ansible_facts.services[\"ipfs.service\"].state == \"running\") | ternary(ipfs_local_release_url, ipfs_public_release_url) }}"
-    dest: "/usr/local/lib/ipfs-{{ ipfs_version }}"
+    dest: "/usr/local/lib/ipfs-{{ ipfs_version }}/"
     creates: "/usr/local/lib/ipfs-{{ ipfs_version }}/go-ipfs"
     remote_src: yes
     owner: root
