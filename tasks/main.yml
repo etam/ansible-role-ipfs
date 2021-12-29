@@ -78,8 +78,11 @@
 - name: Config ipfs Gateway.PublicGateways
   become: yes
   become_user: ipfs
-  command:
-    cmd: "ipfs config --json Gateway.PublicGateways '{\"localhost\": null }'"
+  ipfs_config:
+    key: Gateway.PublicGateways
+    value:
+      localhost: null
+  notify: Restart ipfs
 
 - name: Install ipfs.service
   become: yes
