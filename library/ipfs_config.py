@@ -59,7 +59,7 @@ def try_json_loads(s):
     try:
         return json.loads(s)
     except json.JSONDecodeError:
-        return f"\"{s.rstrip()}\""
+        return s.rstrip()
 
 
 def get_config(module):
@@ -74,7 +74,7 @@ def get_config(module):
 def set_config(module, conf):
     module.run_command(
         ["ipfs", "config", "--json",
-         module.params['key'], conf],
+         module.params['key'], json.dumps(conf)],
         check_rc=True,
     )
 
