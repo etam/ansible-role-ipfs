@@ -50,8 +50,16 @@ EXAMPLES = r'''
 
 
 import json
+import yaml
 
 from ansible.module_utils.basic import AnsibleModule
+
+
+def try_json_loads(s):
+    try:
+        return json.loads(s)
+    except json.JSONDecodeError:
+        return f"\"{s.rstrip()}\""
 
 
 def get_config(module):
@@ -60,39 +68,58 @@ def get_config(module):
         check_rc=True,
     )
 
-    return json.loads(stdout)
+    return try_json_loads(stdout)
 
 
-def set_config(module):
+def set_config(module, conf):
     module.run_command(
         ["ipfs", "config", "--json",
-         module.params['key'], module.params['value']],
+         module.params['key'], conf],
         check_rc=True,
     )
 
 
 def run_module():
-    module_args = dict(
-        key=dict(type='str', required=True),
-        value=dict(type='json', required=True),
-    )
+    module_args = {
+        'key': {
+            'type': 'str',
+            'required': True,
+        },
+        'value': {
+            'type': 'json',
+            'required': True,
+        },
+    }
+
+    result = {
+        'diff': {
+            'before': None,
+            'after': None,
+        },
+        'changed': False,
+    }
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True
     )
 
-    config_pre = get_config(module)
-    if config_pre == module.params['value']:
-        module.exit_json(changed=False)
+    conf_pre = get_config(module)
+    conf_post = try_json_loads(module.params['value'])
+    result['diff']['before'] = yaml.dump(conf_pre)
+    result['diff']['after'] = yaml.dump(conf_post)
 
-    # TODO: diff mode?
+    if conf_pre == conf_post:
+        module.exit_json(**result)
+
+    result['changed'] = True
+
     if module.check_mode:
-        module.exit_json(changed=True)
+        module.exit_json(**result)
 
-    set_config(module)
+    set_config(module, conf_post)
 
-    module.exit_json(changed=True)
+    module.exit_json(**result)
 
 
 def main():

@@ -75,13 +75,62 @@
     cmd: "ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
-- name: Config ipfs Gateway.PublicGateways
+- name: Config ipfs Addresses.Swarm
   become: yes
   become_user: ipfs
   ipfs_config:
-    key: Gateway.PublicGateways
+    key: Addresses.Swarm
     value:
-      localhost: null
+      - "/ip4/0.0.0.0/tcp/{{ ipfs_swarm_port }}"
+      - "/ip6/::/tcp/{{ ipfs_swarm_port }}"
+      - "/ip4/0.0.0.0/udp/{{ ipfs_swarm_port }}/quic"
+      - "/ip6/::/udp/{{ ipfs_swarm_port }}/quic"
+  notify: Restart ipfs
+
+- name: Config ipfs Addresses.Announce
+  become: yes
+  become_user: ipfs
+  ipfs_config:
+    key: Addresses.Announce
+    value: "{{ ipfs_public_addresses }}"
+  notify: Restart ipfs
+
+- name: Get ipfs Identity.PeerID
+  become: yes
+  become_user: ipfs
+  ipfs_config_get:
+    key: Identity.PeerID
+  register: ipfs_identity_peerid
+
+- name: Workaround issue 6189
+  # https://github.com/ansible/ansible/issues/6189
+  set_fact:
+    ipfs_public_addresses: "{{ ipfs_public_addresses }}"
+    ipfs_private_addresses: "{{ ipfs_private_addresses }}"
+
+- name: Config ipfs Peering.Peers
+  become: yes
+  become_user: ipfs
+  ipfs_config:
+    key: Peering.Peers
+    value: |
+      [
+      {% for host in groups['ipfs'] if host in ansible_play_hosts and host != inventory_hostname %}
+        {
+          'Addrs': {{ hostvars[host]['ipfs_public_addresses'] + hostvars[host]['ipfs_private_addresses'] }},
+          'ID': "{{ hostvars[host]['ipfs_identity_peerid']['value'] }}",
+        },
+      {% endfor %}
+      ]
+  notify: Restart ipfs
+
+- name: Config ipfs extra
+  become: yes
+  become_user: ipfs
+  ipfs_config:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+  loop: "{{ ipfs_config_extra | dict2items }}"
   notify: Restart ipfs
 
 - name: Install ipfs.service

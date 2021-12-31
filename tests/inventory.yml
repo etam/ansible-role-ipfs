@@ -7,7 +7,19 @@ all:
     testvm1:
       ansible_host: testvm1
       ansible_user: vagrant
+      # test disabling ProtectHome=
       ipfs_blocks_dir: /home/data/ipfs
     testvm2:
       ansible_host: testvm2
       ansible_user: vagrant
+      ipfs_config_extra:
+        # test values that are strings, not dicts or lists
+        Addresses.API: /ip4/0.0.0.0/tcp/5001
+        Addresses.Gateway: /ip4/0.0.0.0/tcp/8080
+
+  children:
+    ipfs:
+      hosts:
+        testvm0:
+        testvm1:
+        testvm2:

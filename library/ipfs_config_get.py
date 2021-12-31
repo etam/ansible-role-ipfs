@@ -62,7 +62,10 @@ def get_config(module):
         check_rc=True,
     )
 
-    return json.loads(stdout)
+    try:
+        return json.loads(stdout)
+    except json.JSONDecodeError:
+        return stdout.rstrip()
 
 
 def run_module():
