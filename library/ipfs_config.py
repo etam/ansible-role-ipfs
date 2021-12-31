@@ -64,7 +64,7 @@ def try_json_loads(s):
 
 def get_config(module):
     _, stdout, _ = module.run_command(
-        ["ipfs", "config", module.params['key']],
+        ["/usr/local/bin/ipfs", "config", module.params['key']],
         check_rc=True,
     )
 
@@ -73,7 +73,7 @@ def get_config(module):
 
 def set_config(module, conf):
     module.run_command(
-        ["ipfs", "config", "--json",
+        ["/usr/local/bin/ipfs", "config", "--json",
          module.params['key'], json.dumps(conf)],
         check_rc=True,
     )

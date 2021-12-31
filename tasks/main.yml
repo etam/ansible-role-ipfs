@@ -72,7 +72,7 @@
   become: yes
   become_user: ipfs
   command:
-    cmd: "ipfs init -e -p \"{{ ipfs_init_profile }}\""
+    cmd: "/usr/local/bin/ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
 - name: Config ipfs Addresses.Swarm

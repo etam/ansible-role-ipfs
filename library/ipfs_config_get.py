@@ -58,7 +58,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def get_config(module):
     _, stdout, _ = module.run_command(
-        ["ipfs", "config", module.params['key']],
+        ["/usr/local/bin/ipfs", "config", module.params['key']],
         check_rc=True,
     )
 
