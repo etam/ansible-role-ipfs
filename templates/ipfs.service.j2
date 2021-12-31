@@ -43,6 +43,7 @@ CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 #Environment=IPFS_PATH=/custom/ipfs/path
 # enable to specify a higher limit for open files/connections
 LimitNOFILE=10240
+Environment="IPFS_FD_MAX=10240"
 
 #don't use swap
 MemorySwapMax=0
