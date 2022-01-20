@@ -160,6 +160,14 @@
     group: root
   notify: Reload systemd
 
+- name: Set sysctl
+  become: yes
+  sysctl:
+    name: net.core.rmem_max
+    value: '2500000'
+    sysctl_set: yes
+    sysctl_file: /etc/sysctl.d/ipfs.conf
+
 - name: Start ipfs
   become: yes
   systemd:
