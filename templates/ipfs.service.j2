@@ -45,6 +45,9 @@ CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 LimitNOFILE=10240
 Environment="IPFS_FD_MAX=10240"
 
+{% if ipfs_memory_max is defined %}
+MemoryMax={{ ipfs_memory_max }}
+{% endif %}
 #don't use swap
 MemorySwapMax=0
 
