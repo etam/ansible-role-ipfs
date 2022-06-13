@@ -75,6 +75,14 @@
     cmd: "/usr/local/bin/ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
+# - name: Migrate ipfs repo
+#   # will be released in ipfs 0.14.0 ???
+#   # https://github.com/ipfs/go-ipfs/pull/8428
+#   become: yes
+#   become_user: ipfs
+#   command:
+#     cmd: "/usr/local/bin/ipfs repo migrate"
+
 - name: Config ipfs Addresses.Swarm
   become: yes
   become_user: ipfs
