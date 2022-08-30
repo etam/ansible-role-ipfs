@@ -75,6 +75,13 @@
     cmd: "/usr/local/bin/ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
+- name: Stop ipfs
+  become: yes
+  systemd:
+    name: ipfs
+    state: stopped
+  ignore_errors: yes
+
 - name: Migrate ipfs repo
   become: yes
   become_user: ipfs
