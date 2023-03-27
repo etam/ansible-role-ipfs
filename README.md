@@ -6,6 +6,7 @@ Features:
   - Allows to specify custom IP public address, if running behind router.
   - Downloads binaries for updates via local IPFS gateway, if already installed.
   - Runs `ipfs repo gc` as a separate service.
+  - Supports x86_64 and aarch64.
 
 
 ## Requirements
