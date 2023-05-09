@@ -1,5 +1,5 @@
 ipfs_home_dir: /var/lib/ipfs
-ipfs_version: 0.19.1
+ipfs_version: 0.20.0
 ipfs_init_profile: server
 ipfs_gc_when: 05:00
 
