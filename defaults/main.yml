@@ -1,3 +1,5 @@
+ipfs_ansible_group: all
+
 ipfs_home_dir: /var/lib/ipfs
 ipfs_version: 0.20.0
 ipfs_init_profile: server

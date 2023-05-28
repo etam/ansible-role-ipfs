@@ -16,6 +16,7 @@ Features:
 
 ## Role Variables
 
+- `ipfs_ansible_group`: Ansible group, that contains managed ipfs nodes. Default: `all`.
 - `ipfs_home_dir`: default `/var/lib/ipfs`
 - `ipfs_version`: (it's obvious)
 - `ipfs_init_profile`: Profile to apply when initializing ipfs (see [Configure profile](https://docs.ipfs.tech/how-to/default-profile/))

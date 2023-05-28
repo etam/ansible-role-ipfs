@@ -23,3 +23,5 @@ all:
         testvm0:
         testvm1:
         testvm2:
+      vars:
+        ipfs_ansible_group: ipfs
