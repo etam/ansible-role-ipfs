@@ -27,7 +27,17 @@ Features:
   - `/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic-v1`
   - `/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic-v1/webtransport`
 - `ipfs_private_addresses`: Formatted like `ipfs_public_addresses`. Used for direct connection between IPFS nodes. May be useful when connecting over LAN on VPN.
-- `ipfs_config_extra`: Additional IPFS node config. The yaml structure is converted to json and sent to `ipfs config`.
+- `ipfs_config_extra`: Additional IPFS node config. The yaml structure is converted to json and sent to `ipfs config`. Default value is
+    ```yaml
+    ipfs_config_extra:
+      Gateway.PublicGateways:
+        localhost: null
+    ```
+    This results in running
+    ```sh
+    ipfs config --json Gateway.PublicGateways '{"localhost": null}'
+    ```
+    which comes from https://github.com/ipfs/kubo/blob/master/docs/config.md#implicit-defaults-of-gatewaypublicgateways
 
 
 ## Dependencies
