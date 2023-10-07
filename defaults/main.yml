@@ -1,7 +1,7 @@
 ipfs_ansible_group: all
 
 ipfs_home_dir: /var/lib/ipfs
-ipfs_version: 0.22.0
+ipfs_version: 0.23.0
 ipfs_init_profile: server
 ipfs_gc_when: 05:00
 
@@ -11,7 +11,6 @@ ipfs_swarm_port: 4001
 # - /ip(4|6)/{{ip}}/udp/{{port}}/quic
 ipfs_public_addresses:
   - "/ip4/{{ ansible_default_ipv4['address'] }}/tcp/{{ ipfs_swarm_port }}"
-  - "/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic"
   - "/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic-v1"
   - "/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic-v1/webtransport"
 ipfs_private_addresses: []

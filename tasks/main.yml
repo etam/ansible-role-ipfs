@@ -95,11 +95,9 @@
     key: Addresses.Swarm
     value:
       - "/ip4/0.0.0.0/tcp/{{ ipfs_swarm_port }}"
-      - "/ip4/0.0.0.0/udp/{{ ipfs_swarm_port }}/quic"
       - "/ip4/0.0.0.0/udp/{{ ipfs_swarm_port }}/quic-v1"
       - "/ip4/0.0.0.0/udp/{{ ipfs_swarm_port }}/quic-v1/webtransport"
       - "/ip6/::/tcp/{{ ipfs_swarm_port }}"
-      - "/ip6/::/udp/{{ ipfs_swarm_port }}/quic"
       - "/ip6/::/udp/{{ ipfs_swarm_port }}/quic-v1"
       - "/ip6/::/udp/{{ ipfs_swarm_port }}/quic-v1/webtransport"
   notify: Restart ipfs
