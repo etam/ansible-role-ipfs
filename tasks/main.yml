@@ -21,6 +21,15 @@
     path: "/usr/local/lib/ipfs-{{ ipfs_version }}"
     state: directory
 
+- name: Check if ipfs is already downloaded
+  # this is to decide whether it's required to stop ipfs before "ipfs migrate"
+  stat:
+    path: "/usr/local/lib/ipfs-{{ ipfs_version }}/kubo"
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: ipfs_bin_before_download
+
 - name: Download ipfs
   become: yes
   unarchive:
@@ -75,18 +84,22 @@
     cmd: "/usr/local/bin/ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
-- name: Stop ipfs
-  become: yes
-  systemd:
-    name: ipfs
-    state: stopped
-  ignore_errors: yes
+- name: Migrate ipfs
+  when: not ipfs_bin_before_download.stat.exists
+  block:
 
-- name: Migrate ipfs repo
-  become: yes
-  become_user: ipfs
-  command:
-    cmd: "/usr/local/bin/ipfs repo migrate"
+  - name: Stop ipfs
+    become: yes
+    systemd:
+      name: ipfs
+      state: stopped
+    ignore_errors: yes
+
+  - name: Migrate ipfs repo
+    become: yes
+    become_user: ipfs
+    command:
+      cmd: "/usr/local/bin/ipfs repo migrate"
 
 - name: Config ipfs Addresses.Swarm
   become: yes
