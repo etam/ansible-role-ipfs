@@ -1,12 +1,13 @@
 # IPFS
 
 Features:
-  - Automatic `Peering.Peers` generation.
-  - Configuration is applied via `ipfs config` using custom module. Supports idempotence and generating diffs.
-  - Allows to specify custom IP public address, if running behind router.
-  - Downloads binaries for updates via local IPFS gateway, if already installed.
-  - Runs `ipfs repo gc` as a separate service.
-  - Supports x86_64 and aarch64.
+
+- Automatic `Peering.Peers` generation.
+- Configuration is applied via `ipfs config` using custom module. Supports idempotence and generating diffs.
+- Allows to specify custom IP public address, if running behind router.
+- Downloads binaries for updates via local IPFS gateway, if already installed.
+- Runs `ipfs repo gc` as a separate service.
+- Supports x86_64 and aarch64.
 
 
 ## Requirements
