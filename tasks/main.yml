@@ -85,7 +85,7 @@
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
 - name: Migrate ipfs
-  when: not ipfs_bin_before_download.stat.exists
+  when: not ipfs_bin_before_download.stat.exists or ipfs_force_migration
   block:
 
   - name: Stop ipfs
