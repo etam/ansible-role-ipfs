@@ -21,6 +21,7 @@ Features:
 - `ipfs_version`: (it's obvious)
 - `ipfs_init_profile`: Profile to apply when initializing ipfs (see [Configure profile](https://docs.ipfs.tech/how-to/default-profile/))
 - `ipfs_gc_when`: When to run `ipfs repo gc`. Systemd time (see `man systemd.time`).
+- `ipfs_force_https_download`: Force downloading binary archive from https, even when service is running. Default: `no`.
 - `ipfs_force_migration`: Force running `ipfs repo migrate`. Implies unconditionally stopping the service. Default: `no`.
 - `ipfs_swarm_port`: 4001
 - `ipfs_public_addresses`: Public swarm addresses. Default:

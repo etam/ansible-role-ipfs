@@ -45,7 +45,7 @@
 - name: Download ipfs
   become: yes
   unarchive:
-    src: "{{ (ansible_facts.services[\"ipfs.service\"] is defined and ansible_facts.services[\"ipfs.service\"].state == \"running\") | ternary(ipfs_local_release_url, ipfs_public_release_url) }}"
+    src: "{{ ((not ipfs_force_https_download) and (ansible_facts.services[\"ipfs.service\"] is defined and ansible_facts.services[\"ipfs.service\"].state == \"running\")) | ternary(ipfs_local_release_url, ipfs_public_release_url) }}"
     dest: "/usr/local/lib/ipfs-{{ ipfs_version }}/"
     creates: "/usr/local/lib/ipfs-{{ ipfs_version }}/kubo"
     remote_src: yes

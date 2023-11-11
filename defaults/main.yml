@@ -4,6 +4,7 @@ ipfs_home_dir: /var/lib/ipfs
 ipfs_version: 0.24.0
 ipfs_init_profile: server
 ipfs_gc_when: 05:00
+ipfs_force_https_download: no
 ipfs_force_migration: no
 
 ipfs_swarm_port: 4001
