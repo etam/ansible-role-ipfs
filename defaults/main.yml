@@ -1,7 +1,7 @@
 ipfs_ansible_group: all
 
 ipfs_home_dir: /var/lib/ipfs
-ipfs_version: 0.26.0
+ipfs_version: 0.27.0
 ipfs_init_profile: server
 ipfs_gc_when: 05:00
 ipfs_force_https_download: no
