@@ -7,7 +7,7 @@ ipfs_local_release_url: "http://localhost:8080/ipns/{{ ipfs_common_release_url }
 
 ipfs_dep_python3_yaml: >-
   {%- if ansible_os_family == "Suse" -%}
-    python3-PyYAML
+    python{{ansible_python.version.major}}{{ansible_python.version.minor}}-PyYAML
   {%- elif ansible_os_family == "Debian" -%}
     python3-yaml
   {%- endif -%}
