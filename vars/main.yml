@@ -11,3 +11,14 @@ ipfs_dep_python3_yaml: >-
   {%- elif ansible_os_family == "Debian" -%}
     python3-yaml
   {%- endif -%}
+
+# TODO: can we avoid generating and parsing json back and forth?
+ipfs_peering_peers_json: |
+  [
+  {% for host in groups[ipfs_ansible_group] if host in ansible_play_hosts and host != inventory_hostname %}
+    {
+      "Addrs": {{ (hostvars[host]['ipfs_public_addresses'] + hostvars[host]['ipfs_private_addresses']) | to_json }},
+      "ID": "{{ hostvars[host]['ipfs_identity_peerid']['value'] }}"
+    }{% if not loop.last %},{% endif %}
+  {% endfor %}
+  ]

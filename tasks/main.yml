@@ -153,15 +153,7 @@
   become_user: ipfs
   ipfs_config:
     key: Peering.Peers
-    value: |
-      [
-      {% for host in groups[ipfs_ansible_group] if host in ansible_play_hosts and host != inventory_hostname %}
-        {
-          'Addrs': {{ hostvars[host]['ipfs_public_addresses'] + hostvars[host]['ipfs_private_addresses'] }},
-          'ID': "{{ hostvars[host]['ipfs_identity_peerid']['value'] }}",
-        },
-      {% endfor %}
-      ]
+    value: "{{ ipfs_peering_peers_json | from_json }}"
   notify: Restart ipfs
 
 - name: Config ipfs extra
