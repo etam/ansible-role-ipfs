@@ -1,60 +1,62 @@
+---
 - name: Apt update
-  when: ansible_os_family == "Debian"
-  become: yes
-  apt:
-    update_cache: yes
+  when: ansible_facts.os_family == "Debian"
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
 
 - name: Install dependencies
-  become: yes
-  package:
+  become: true
+  ansible.builtin.package:
     name: "{{ ipfs_dep_python3_yaml }}"
     state: present
 
 - name: Get service facts
-  service_facts:
+  ansible.builtin.service_facts:
 
 - name: Create ipfs group
-  become: yes
-  group:
-    system: yes
+  become: true
+  ansible.builtin.group:
+    system: true
     name: ipfs
 
 - name: Create ipfs user
-  become: yes
-  user:
-    system: yes
+  become: true
+  ansible.builtin.user:
+    system: true
     name: ipfs
     group: ipfs
     home: "{{ ipfs_home_dir }}"
 
 - name: Create download directory
-  become: yes
-  file:
+  become: true
+  ansible.builtin.file:
     path: "/usr/local/lib/ipfs-{{ ipfs_version }}"
     state: directory
+    mode: "755"
 
 - name: Check if ipfs is already downloaded
   # this is to decide whether it's required to stop ipfs before "ipfs migrate"
-  stat:
+  ansible.builtin.stat:
     path: "/usr/local/lib/ipfs-{{ ipfs_version }}/kubo"
-    get_attributes: no
-    get_checksum: no
-    get_mime: no
+    get_attributes: false
+    get_checksum: false
+    get_mime: false
   register: ipfs_bin_before_download
 
 - name: Download ipfs
-  become: yes
-  unarchive:
+  become: true
+  ansible.builtin.unarchive:
     src: "{{ ((not ipfs_force_https_download) and (ansible_facts.services[\"ipfs.service\"] is defined and ansible_facts.services[\"ipfs.service\"].state == \"running\")) | ternary(ipfs_local_release_url, ipfs_public_release_url) }}"
     dest: "/usr/local/lib/ipfs-{{ ipfs_version }}/"
     creates: "/usr/local/lib/ipfs-{{ ipfs_version }}/kubo"
-    remote_src: yes
+    remote_src: true
     owner: root
     group: root
 
 - name: Link ipfs binary
-  become: yes
-  file:
+  become: true
+  ansible.builtin.file:
     src: "/usr/local/lib/ipfs-{{ ipfs_version }}/kubo/ipfs"
     dest: "/usr/local/bin/ipfs"
     state: link
@@ -63,58 +65,60 @@
 - name: Blocks dir
   when: ipfs_blocks_dir is defined
   block:
-
     - name: Create blocks dir
-      become: yes
-      file:
+      become: true
+      ansible.builtin.file:
         path: "{{ ipfs_blocks_dir }}"
         state: directory
         owner: ipfs
         group: ipfs
+        mode: "755"
 
     - name: Create ipfs dir
-      become: yes
-      file:
+      become: true
+      ansible.builtin.file:
         path: "{{ ipfs_home_dir }}/.ipfs/"
         state: directory
         owner: ipfs
         group: ipfs
+        mode: "755"
 
     - name: Link blocks dir
-      become: yes
+      become: true
       become_user: ipfs
-      file:
+      ansible.builtin.file:
         state: link
         path: "{{ ipfs_home_dir }}/.ipfs/blocks"
         src: "{{ ipfs_blocks_dir }}"
       notify: Restart ipfs
 
 - name: Init ipfs
-  become: yes
+  become: true
   become_user: ipfs
-  command:
+  ansible.builtin.command:
     cmd: "/usr/local/bin/ipfs init -e -p \"{{ ipfs_init_profile }}\""
     creates: "{{ ipfs_home_dir }}/.ipfs/config"
 
 - name: Migrate ipfs
+  # TODO: compare output of `ipfs repo version -q` with "{{ ipfs_home_dir }}/.ipfs/version"
   when: not ipfs_bin_before_download.stat.exists or ipfs_force_migration
   block:
+    - name: Stop ipfs
+      become: true
+      ansible.builtin.systemd:
+        name: ipfs
+        state: stopped
+      failed_when: false
 
-  - name: Stop ipfs
-    become: yes
-    systemd:
-      name: ipfs
-      state: stopped
-    ignore_errors: yes
-
-  - name: Migrate ipfs repo
-    become: yes
-    become_user: ipfs
-    command:
-      cmd: "/usr/local/bin/ipfs repo migrate"
+    - name: Migrate ipfs repo
+      become: true
+      become_user: ipfs
+      ansible.builtin.command:
+        cmd: "/usr/local/bin/ipfs repo migrate"
+      changed_when: true
 
 - name: Config ipfs Addresses.Swarm
-  become: yes
+  become: true
   become_user: ipfs
   ipfs_config:
     key: Addresses.Swarm
@@ -128,7 +132,7 @@
   notify: Restart ipfs
 
 - name: Config ipfs Addresses.Announce
-  become: yes
+  become: true
   become_user: ipfs
   ipfs_config:
     key: Addresses.Announce
@@ -136,7 +140,7 @@
   notify: Restart ipfs
 
 - name: Get ipfs Identity.PeerID
-  become: yes
+  become: true
   become_user: ipfs
   ipfs_config_get:
     key: Identity.PeerID
@@ -144,12 +148,12 @@
 
 - name: Workaround issue 6189
   # https://github.com/ansible/ansible/issues/6189
-  set_fact:
+  ansible.builtin.set_fact:
     ipfs_public_addresses: "{{ ipfs_public_addresses }}"
     ipfs_private_addresses: "{{ ipfs_private_addresses }}"
 
 - name: Config ipfs Peering.Peers
-  become: yes
+  become: true
   become_user: ipfs
   ipfs_config:
     key: Peering.Peers
@@ -157,7 +161,7 @@
   notify: Restart ipfs
 
 - name: Config ipfs extra
-  become: yes
+  become: true
   become_user: ipfs
   ipfs_config:
     key: "{{ item.key }}"
@@ -166,60 +170,63 @@
   notify: Restart ipfs
 
 - name: Install ipfs.service
-  become: yes
-  template:
+  become: true
+  ansible.builtin.template:
     src: ipfs.service.j2
     dest: /etc/systemd/system/ipfs.service
     owner: root
     group: root
+    mode: "644"
   notify: Restart ipfs
 
 - name: Install ipfs-gc.service
-  become: yes
-  copy:
+  become: true
+  ansible.builtin.copy:
     src: ipfs-gc.service
     dest: /etc/systemd/system/ipfs-gc.service
     owner: root
     group: root
+    mode: "644"
   notify: Reload systemd
 
 - name: Install ipfs-gc.timer
-  become: yes
-  template:
+  become: true
+  ansible.builtin.template:
     src: ipfs-gc.timer.j2
     dest: /etc/systemd/system/ipfs-gc.timer
     owner: root
     group: root
+    mode: "644"
   notify: Reload systemd
 
 - name: Check /proc/sys/net/core/rmem_max is writable
-  become: yes
+  become: true
   ansible.builtin.stat:
     path: /proc/sys/net/core/rmem_max
   register: rmem_max
 
 - name: Set sysctl
-  become: yes
-  sysctl:
+  become: true
+  ansible.posix.sysctl:
     name: net.core.rmem_max
-    value: '2500000'
-    sysctl_set: yes
+    value: "2500000"
+    sysctl_set: true
     sysctl_file: /etc/sysctl.d/ipfs.conf
   when: rmem_max.stat.writeable is defined and rmem_max.stat.writeable
 
 - name: Start ipfs
-  become: yes
-  systemd:
-    daemon_reload: yes
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
     name: ipfs
-    enabled: yes
+    enabled: true
     state: started
   register: ipfs_start
 
 - name: Start ipfs-gc
-  become: yes
-  systemd:
-    daemon_reload: yes
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
     name: ipfs-gc.timer
-    enabled: yes
+    enabled: true
     state: started

@@ -1,11 +1,12 @@
+---
 ipfs_ansible_group: all
 
 ipfs_home_dir: /var/lib/ipfs
 ipfs_version: 0.38.2
 ipfs_init_profile: server
 ipfs_gc_when: 05:00
-ipfs_force_https_download: no
-ipfs_force_migration: no
+ipfs_force_https_download: true
+ipfs_force_migration: true
 
 ipfs_swarm_port: 4001
 # format:
@@ -17,7 +18,6 @@ ipfs_public_addresses:
   - "/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic-v1"
   - "/ip4/{{ ansible_default_ipv4['address'] }}/udp/{{ ipfs_swarm_port }}/quic-v1/webtransport"
 ipfs_private_addresses: []
-
 ipfs_config_extra:
   Gateway.PublicGateways:
-    localhost: null
+    localhost:
