@@ -1,5 +1,0 @@
-- hosts: ipfs
-  vars:
-    ipfs_init_profile: lowpower
-  roles:
-    - ipfs
